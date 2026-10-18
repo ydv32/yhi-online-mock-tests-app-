@@ -1,0 +1,720 @@
+<!-- YHI Online Mock Tests Public Web Deployment File -->
+<!-- Redirects to or mirrors the web application -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>YHI Online Mock Tests ✨ ARVIND YADAV</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="header-nav" id="mainHeader">
+    <div class="nav-container">
+      <div class="brand-wrapper" onclick="App.navigateTo('home')">
+        <div class="brand-logo-badge">YHI</div>
+        <div class="brand-info">
+          <div class="brand-title">YHI Online Mock Tests</div>
+          <div class="brand-curator">Curated by ARVIND YADAV ✨</div>
+        </div>
+      </div>
+
+      <nav class="nav-actions nav-links-desktop">
+        <button class="nav-link-btn active" id="navHomeBtn" onclick="App.navigateTo('home')">
+          <span>🏠</span> Tests
+        </button>
+        <button class="nav-link-btn" id="navScoresBtn" onclick="App.navigateTo('my-scores')">
+          <span>📊</span> Results
+        </button>
+        <button class="nav-link-btn" id="navCardBtn" onclick="App.openRollCardModal()">
+          <span>🎓</span> Roll No ID
+        </button>
+        <button class="nav-link-btn" id="navAdminBtn" onclick="App.navigateTo('admin')">
+          <span>⚙️</span> Admin
+        </button>
+        <button class="nav-link-btn" id="navSyncBtn" onclick="App.openFirebaseModal()">
+          <span id="cloudStatusIcon">☁️</span> Cloud Sync
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div id="studentAuthContainer"></div>
+        <button class="mobile-menu-toggle" onclick="App.toggleMobileDrawer()" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="modal-overlay" id="mobileDrawer">
+    <div class="modal-card" style="max-width: 320px; margin-left: auto;">
+      <div class="modal-header">
+        <div class="modal-title">Menu</div>
+        <button class="close-modal-btn" onclick="App.toggleMobileDrawer()">✕</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <button class="btn-outline" style="justify-content: flex-start;" onclick="App.navigateTo('home'); App.toggleMobileDrawer();">🏠 Test Catalog</button>
+        <button class="btn-outline" style="justify-content: flex-start;" onclick="App.navigateTo('my-scores'); App.toggleMobileDrawer();">📊 My Scores & Analytics</button>
+        <button class="btn-outline" style="justify-content: flex-start;" onclick="App.openRollCardModal(); App.toggleMobileDrawer();">🎓 Student Roll ID Card</button>
+        <button class="btn-outline" style="justify-content: flex-start;" onclick="App.navigateTo('admin'); App.toggleMobileDrawer();">⚙️ Admin Dashboard</button>
+        <button class="btn-outline" style="justify-content: flex-start;" onclick="App.openFirebaseModal(); App.toggleMobileDrawer();">☁️ Firebase & Cloud Settings</button>
+      </div>
+      <div class="footer-curator-badge" style="margin-top: 2rem; width: 100%; justify-content: center;">
+        ARVIND YADAV ✨ Portal
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App View Router -->
+  <main class="main-content" id="appMainContainer">
+
+    <!-- VIEW 1: HOME & TEST CATALOG -->
+    <section id="viewHome">
+      <div class="hero-banner">
+        <div class="hero-glow-1"></div>
+        <div class="hero-glow-2"></div>
+        <div class="hero-content">
+          <div class="hero-pill">✨ Official Examination Portal • 2026</div>
+          <h1 class="hero-title">Master Your Competitive Exams with <span>YHI Mock Tests</span></h1>
+          <p class="hero-desc">
+            Experience real Computer Based Test (CBT) environment. Subject-wise questions, authentic countdown timers, instant automated scoring, and comprehensive step-by-step explanations designed by <strong>ARVIND YADAV ✨</strong>.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-gold" onclick="App.scrollToTests()">
+              <span>🚀</span> Start a Mock Test
+            </button>
+            <button class="btn-outline" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);" onclick="App.openAuthModal('register')">
+              <span>🆔</span> Get Roll Number
+            </button>
+            <button class="btn-outline" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);" onclick="App.navigateTo('admin')">
+              <span>🛠️</span> Manage Tests
+            </button>
+          </div>
+
+          <div class="hero-stats-grid">
+            <div class="hero-stat-card">
+              <span class="hero-stat-num" id="statTotalTests">8+</span>
+              <span class="hero-stat-label">Subject Tests</span>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hero-stat-num" id="statTotalQues">100+</span>
+              <span class="hero-stat-label">Curated MCQs</span>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hero-stat-num">100%</span>
+              <span class="hero-stat-label">Detailed Solutions</span>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hero-stat-num">CBT</span>
+              <span class="hero-stat-label">Live Timer & Palette</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="testCatalogSection" style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">Subject-Wise Mock Tests</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Select a subject and click Start Test to launch the CBT simulation.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="searchTestInput" placeholder="Search test name..." class="form-input" style="max-width: 220px; padding: 0.45rem 0.75rem; font-size: 0.85rem;" oninput="App.filterTests()">
+        </div>
+      </div>
+
+      <div class="tabs-scroll-wrapper">
+        <div class="tabs-list" id="subjectFilterTabs">
+          <button class="tab-chip active" data-subject="all" onclick="App.setSubjectFilter('all')">🌟 All Subjects</button>
+          <button class="tab-chip" data-subject="math" onclick="App.setSubjectFilter('math')">📐 Mathematics & Quantitative</button>
+          <button class="tab-chip" data-subject="science" onclick="App.setSubjectFilter('science')">🔬 General Science</button>
+          <button class="tab-chip" data-subject="gk" onclick="App.setSubjectFilter('gk')">🌍 GK & Current Affairs</button>
+          <button class="tab-chip" data-subject="english" onclick="App.setSubjectFilter('english')">📖 English Language</button>
+          <button class="tab-chip" data-subject="reasoning" onclick="App.setSubjectFilter('reasoning')">🧩 Logical Reasoning</button>
+          <button class="tab-chip" data-subject="computer" onclick="App.setSubjectFilter('computer')">💻 Computer Awareness</button>
+        </div>
+      </div>
+
+      <div class="tests-grid" id="testsGridContainer"></div>
+    </section>
+
+    <!-- VIEW 2: MY SCORES & ATTEMPTS -->
+    <section id="viewScores" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.5rem; font-weight: 800;">Candidate Performance & History</h2>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">Track your test attempts, accuracy progression, and view previous answer explanations.</p>
+        </div>
+        <button class="btn-outline" onclick="App.navigateTo('home')">← Back to Test Catalog</button>
+      </div>
+
+      <div id="scoresHistoryList"></div>
+    </section>
+
+    <!-- VIEW 3: ADMIN CONSOLE & TEST MANAGEMENT -->
+    <section id="viewAdmin" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 800;">Admin Management Portal</h2>
+            <span class="badge-math subject-badge">Staff Only</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">Manage mock tests, author questions, view registered candidates and submission scores.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn-gold" onclick="App.openCreateTestModal()">+ Create New Test</button>
+          <button class="btn-outline" onclick="App.navigateTo('home')">Exit Admin</button>
+        </div>
+      </div>
+
+      <div class="tabs-scroll-wrapper">
+        <div class="tabs-list">
+          <button class="tab-chip active" id="tabAdminTests" onclick="App.switchAdminTab('tests')">📑 Tests List (<span id="adminTestCount">0</span>)</button>
+          <button class="tab-chip" id="tabAdminStudents" onclick="App.switchAdminTab('students')">👥 Registered Candidates (<span id="adminStudentCount">0</span>)</button>
+          <button class="tab-chip" id="tabAdminSubmissions" onclick="App.switchAdminTab('submissions')">📊 Test Submissions (<span id="adminSubCount">0</span>)</button>
+          <button class="tab-chip" id="tabAdminBackup" onclick="App.switchAdminTab('backup')">💾 Backup & JSON Data</button>
+        </div>
+      </div>
+
+      <div id="adminPanelTests">
+        <div class="tests-grid" id="adminTestsList"></div>
+      </div>
+
+      <div id="adminPanelStudents" style="display: none;">
+        <div class="test-card" style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border); color: var(--text-secondary);">
+                <th style="padding: 0.75rem;">Roll Number</th>
+                <th style="padding: 0.75rem;">Candidate Name</th>
+                <th style="padding: 0.75rem;">Email</th>
+                <th style="padding: 0.75rem;">Target Exam</th>
+                <th style="padding: 0.75rem;">Registered On</th>
+              </tr>
+            </thead>
+            <tbody id="adminStudentsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="adminPanelSubmissions" style="display: none;">
+        <div class="test-card" style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border); color: var(--text-secondary);">
+                <th style="padding: 0.75rem;">Date & Time</th>
+                <th style="padding: 0.75rem;">Candidate & Roll No</th>
+                <th style="padding: 0.75rem;">Test Title</th>
+                <th style="padding: 0.75rem;">Score</th>
+                <th style="padding: 0.75rem;">Accuracy</th>
+                <th style="padding: 0.75rem;">Time Taken</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubmissionsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="adminPanelBackup" style="display: none;">
+        <div class="test-card" style="max-width: 600px;">
+          <h3 style="margin-bottom: 0.75rem; font-size: 1.1rem;">Export & Import Exam Data</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+            Download all tests and MCQs as a JSON backup or import a customized question bank.
+          </p>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="App.exportTestsJSON()">⬇️ Export Tests JSON</button>
+            <label class="btn-outline" style="cursor: pointer;">
+              ⬆️ Import Tests JSON
+              <input type="file" id="importJsonFileInput" accept=".json" style="display: none;" onchange="App.importTestsJSON(event)">
+            </label>
+            <button class="btn-outline" style="color: var(--danger);" onclick="App.resetToDefaultQuestions()">🔄 Reset to Defaults</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: TEST SCORECARD & REVIEW -->
+    <section id="viewScorecard" style="display: none;">
+      <div class="scorecard-banner">
+        <div class="hero-pill" style="margin-bottom: 0.5rem;">🎉 Examination Completed</div>
+        <h2 style="font-size: 1.8rem; font-weight: 800;" id="resultTestTitle">Subject Mock Test</h2>
+        <p style="font-size: 0.9rem; color: #cbd5e1;" id="resultCandidateInfo">Candidate: John Doe (Roll: YHI-2026-0001)</p>
+
+        <div class="score-circle">
+          <span class="score-main-val" id="resultMarksScored">24</span>
+          <span class="score-total-val" id="resultTotalMarks">/ 30 Marks</span>
+        </div>
+
+        <p style="font-size: 1.1rem; font-weight: 700; color: #fef08a;" id="resultPerformanceBadge">Excellent Performance! ✨</p>
+      </div>
+
+      <div class="score-breakdown-grid">
+        <div class="stat-metric-card">
+          <div class="stat-icon-wrap" style="background: #eff6ff; color: #2563eb;">🎯</div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">ACCURACY</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary);" id="resultAccuracy">85%</div>
+          </div>
+        </div>
+        <div class="stat-metric-card">
+          <div class="stat-icon-wrap" style="background: #ecfdf5; color: #059669;">✅</div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">CORRECT ANSWERS</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--success);" id="resultCorrectCount">12 / 15</div>
+          </div>
+        </div>
+        <div class="stat-metric-card">
+          <div class="stat-icon-wrap" style="background: #fef2f2; color: #dc2626;">❌</div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">INCORRECT / PENALTY</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--danger);" id="resultWrongCount">2 (-1.0)</div>
+          </div>
+        </div>
+        <div class="stat-metric-card">
+          <div class="stat-icon-wrap" style="background: #f8fafc; color: #64748b;">⏱️</div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">TIME TAKEN</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary);" id="resultTimeTaken">08m 42s</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem;">
+        <button class="btn-gold" onclick="App.openCertificateModal()">📜 View Performance Certificate</button>
+        <button class="btn-primary" onclick="App.scrollToSolutions()">🔍 Review Detailed Explanations</button>
+        <button class="btn-outline" onclick="App.retakeActiveTest()">🔄 Retake Test</button>
+        <button class="btn-outline" onclick="App.navigateTo('home')">🏠 Test Catalog</button>
+      </div>
+
+      <div id="solutionsSection">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <h3 style="font-size: 1.3rem; font-weight: 800;">Question Solutions & Step-by-Step Explanations</h3>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="tab-chip active" id="btnFilterReviewAll" onclick="App.filterReviewSolutions('all')">All</button>
+            <button class="tab-chip" id="btnFilterReviewCorrect" onclick="App.filterReviewSolutions('correct')">Correct</button>
+            <button class="tab-chip" id="btnFilterReviewWrong" onclick="App.filterReviewSolutions('wrong')">Incorrect</button>
+            <button class="tab-chip" id="btnFilterReviewSkipped" onclick="App.filterReviewSolutions('skipped')">Skipped</button>
+          </div>
+        </div>
+
+        <div id="reviewCardsContainer"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CBT EXAM COCKPIT VIEW -->
+  <div class="exam-view" id="cbtExamCockpit">
+    <div class="exam-topbar">
+      <div class="exam-brand-badge">
+        <div class="brand-logo-badge" style="width: 36px; height: 36px; font-size: 1.1rem;">YHI</div>
+        <div>
+          <div style="font-size: 0.95rem; font-weight: 800;" id="examHeaderTestTitle">CBT Mock Test</div>
+          <div style="font-size: 0.72rem; color: #b45309; font-weight: 700;">Curated by ARVIND YADAV ✨</div>
+        </div>
+      </div>
+
+      <div class="exam-timer-box" id="examTimerBadge">
+        <span>⏱️</span>
+        <span id="examCountdownDisplay">15:00</span>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn-outline" style="padding: 0.4rem 0.65rem; font-size: 0.8rem;" onclick="App.adjustQuestionFont(1)">A+</button>
+        <button class="btn-outline" style="padding: 0.4rem 0.65rem; font-size: 0.8rem;" onclick="App.adjustQuestionFont(-1)">A-</button>
+        <button class="btn-gold" style="padding: 0.45rem 1rem;" onclick="App.confirmSubmitExam()">Submit Test</button>
+      </div>
+    </div>
+
+    <div class="exam-layout">
+      <div class="question-panel" id="questionPanelContainer">
+        <div class="question-header">
+          <div class="q-badge" id="cbtQuestionNumberBadge">Question 1 of 15</div>
+          <div class="q-marks-pill" id="cbtMarksPill">+2.0 / -0.5 Marks</div>
+        </div>
+
+        <div class="question-text" id="cbtQuestionText">Loading question content...</div>
+
+        <div class="options-list" id="cbtOptionsContainer"></div>
+
+        <div class="question-footer-actions">
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-outline" style="color: var(--warning); border-color: #fde68a;" onclick="App.markForReviewAndNext()">
+              🔖 Mark for Review & Next
+            </button>
+            <button class="btn-outline" onclick="App.clearCurrentAnswer()">
+              🧹 Clear Response
+            </button>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-outline" id="cbtPrevBtn" onclick="App.jumpToQuestionOffset(-1)">
+              ◀ Previous
+            </button>
+            <button class="btn-primary" id="cbtSaveNextBtn" onclick="App.saveAndNext()">
+              Save & Next ▶
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="palette-sidebar">
+        <div class="candidate-mini-card">
+          <div class="candidate-avatar" id="cbtAvatarLetter">S</div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.92rem;" id="cbtCandidateName">Student</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);" id="cbtCandidateRoll">Roll: YHI-2026-XXXX</div>
+          </div>
+        </div>
+
+        <div class="palette-status-grid">
+          <div class="status-indicator">
+            <span class="indicator-dot dot-answered"></span> Answered (<span id="countAnswered">0</span>)
+          </div>
+          <div class="status-indicator">
+            <span class="indicator-dot dot-unanswered"></span> Not Answered (<span id="countUnanswered">0</span>)
+          </div>
+          <div class="status-indicator">
+            <span class="indicator-dot dot-marked"></span> Marked (<span id="countMarked">0</span>)
+          </div>
+          <div class="status-indicator">
+            <span class="indicator-dot dot-notvisited"></span> Not Visited (<span id="countNotVisited">0</span>)
+          </div>
+        </div>
+
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem;">
+          QUESTION PALETTE:
+        </div>
+        <div class="palette-numbers" id="cbtPaletteGrid"></div>
+
+        <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+          <button class="btn-gold" style="width: 100%;" onclick="App.confirmSubmitExam()">
+            🏁 Final Submit Test
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION / REGISTRATION MODAL -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="authModalTitle">Student Registration & Roll ID</div>
+        <button class="close-modal-btn" onclick="App.closeAuthModal()">✕</button>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <button class="tab-chip active" id="tabAuthRegister" onclick="App.switchAuthTab('register')" style="flex: 1; justify-content: center;">
+          🆔 Register & Get Roll No
+        </button>
+        <button class="tab-chip" id="tabAuthLogin" onclick="App.switchAuthTab('login')" style="flex: 1; justify-content: center;">
+          🔑 Sign In
+        </button>
+      </div>
+
+      <form id="registerForm" onsubmit="App.handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="regName" class="form-input" placeholder="e.g. Rahul Sharma" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" id="regEmail" class="form-input" placeholder="student@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Examination</label>
+          <select id="regExam" class="form-select">
+            <option value="SSC & State PSC">SSC CGL / CHSL & State PSC</option>
+            <option value="Railways RRB">Railways RRB NTPC & Group D</option>
+            <option value="Banking & Insurance">Banking IBPS / SBI PO & Clerk</option>
+            <option value="UPSC Civil Services">UPSC Civil Services / NDA</option>
+            <option value="CUET & Academic">CUET & Academic Foundation</option>
+            <option value="General Aptitude">General Aptitude & Skills</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" id="regPassword" class="form-input" placeholder="At least 6 characters" minlength="6" required>
+        </div>
+        <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.8rem; color: #92400e; margin-bottom: 1.25rem;">
+          ✨ A permanent unique <strong>Roll Number (e.g. YHI-2026-XXXX)</strong> will be generated upon registration and stamped with <strong>ARVIND YADAV ✨</strong>.
+        </div>
+        <button type="submit" class="btn-gold" style="width: 100%;">
+          Generate Roll Number & Register
+        </button>
+      </form>
+
+      <form id="loginForm" style="display: none;" onsubmit="App.handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Roll Number or Email *</label>
+          <input type="text" id="loginIdentifier" class="form-input" placeholder="e.g. YHI-2026-4821 or user@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="Your password" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; margin-bottom: 0.75rem;">
+          Sign In to Examination Portal
+        </button>
+        <button type="button" class="btn-outline" style="width: 100%; justify-content: center;" onclick="App.loginAsGuest()">
+          ⚡ Quick Guest / Demo Login
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ROLL NUMBER ID CARD MODAL -->
+  <div class="modal-overlay" id="rollCardModal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title">Student Admit / Roll Card</div>
+        <button class="close-modal-btn" onclick="App.closeRollCardModal()">✕</button>
+      </div>
+
+      <div class="certificate-container" style="border: 4px solid #1e3a8a; padding: 1.75rem 1.25rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div style="font-weight: 800; color: #1e1b4b; font-size: 1.1rem;">YHI ONLINE EXAMINATIONS</div>
+          <div class="brand-curator" style="margin: 0;">ARVIND YADAV ✨</div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; align-items: center; text-align: left; margin-bottom: 1.25rem;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-md); background: #1e3a8a; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800;">
+            🎓
+          </div>
+          <div>
+            <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary);" id="cardStudentName">John Candidate</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);" id="cardStudentEmail">john@example.com</div>
+            <div style="font-size: 0.8rem; color: var(--primary); font-weight: 700;" id="cardStudentTarget">Target: SSC CGL</div>
+          </div>
+        </div>
+
+        <div style="background: #eff6ff; border: 2px dashed #3b82f6; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #1d4ed8; font-weight: 700; letter-spacing: 0.05em;">OFFICIAL CANDIDATE ROLL NUMBER</div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #1e1b4b; letter-spacing: 0.08em;" id="cardStudentRoll">YHI-2026-7842</div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted);">
+          Issued under authority of ARVIND YADAV ✨ • Valid for all YHI Computer Based Online Mock Examinations.
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+        <button class="btn-gold" style="flex: 1;" onclick="window.print()">🖨️ Print Roll Card</button>
+        <button class="btn-outline" onclick="App.closeRollCardModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATE OF MERIT MODAL -->
+  <div class="modal-overlay" id="certificateModal">
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title">Certificate of Merit & Performance</div>
+        <button class="close-modal-btn" onclick="App.closeCertificateModal()">✕</button>
+      </div>
+
+      <div class="certificate-container" id="printableCertificate">
+        <div class="cert-header">Certificate of Performance</div>
+        <div class="cert-sub">YHI ONLINE MOCK TESTS • CBT EXAMINATION PORTAL</div>
+        <p style="font-size: 0.95rem; color: #475569; margin-top: 1rem;">This is officially presented to candidate:</p>
+        <div class="cert-student-name" id="certCandidateName">Candidate Name</div>
+        <div class="cert-roll" id="certRollNumber">Roll No: YHI-2026-XXXX</div>
+        <p style="font-size: 0.92rem; color: #334155; line-height: 1.6; max-width: 480px; margin: 0 auto;">
+          for successfully attempting and qualifying the CBT examination on <strong id="certTestTitle">Quantitative Aptitude</strong>, scoring <strong id="certScoreDisplay">28/30 Marks</strong> with an outstanding accuracy of <strong id="certAccuracyDisplay">93%</strong>.
+        </p>
+
+        <div style="display: flex; justify-content: space-around; align-items: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1;">
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">EXAM DATE</div>
+            <div style="font-weight: 700; font-size: 0.85rem;" id="certDateDisplay">17 Oct 2026</div>
+          </div>
+          <div class="cert-stamp">
+            <span>✨ ARVIND YADAV ✨</span>
+            <span style="font-size: 0.68rem; font-weight: 600;">PORTAL DIRECTOR</span>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">VERIFICATION CODE</div>
+            <div style="font-weight: 700; font-size: 0.85rem; font-family: monospace;" id="certVerifyCode">YHI-CERT-9482</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+        <button class="btn-gold" style="flex: 1;" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="btn-outline" onclick="App.closeCertificateModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE / EDIT TEST MODAL -->
+  <div class="modal-overlay" id="createTestModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title" id="createTestModalTitle">Create New Mock Test</div>
+        <button class="close-modal-btn" onclick="App.closeCreateTestModal()">✕</button>
+      </div>
+
+      <form id="createTestForm" onsubmit="App.handleSaveTest(event)">
+        <input type="hidden" id="editTestId" value="">
+        <div class="form-group">
+          <label class="form-label">Test Title *</label>
+          <input type="text" id="testFormTitle" class="form-input" placeholder="e.g. Mathematics Foundation Mock Test 01" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Subject *</label>
+            <select id="testFormSubject" class="form-select">
+              <option value="math">📐 Mathematics</option>
+              <option value="science">🔬 General Science</option>
+              <option value="gk">🌍 GK & Current Affairs</option>
+              <option value="english">📖 English Language</option>
+              <option value="reasoning">🧩 Logical Reasoning</option>
+              <option value="computer">💻 Computer Awareness</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration (Minutes) *</label>
+            <input type="number" id="testFormDuration" class="form-input" value="15" min="1" max="180" required>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Marks Per Question</label>
+            <input type="number" id="testFormMarks" class="form-input" value="2" step="0.5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Negative Penalty</label>
+            <input type="number" id="testFormPenalty" class="form-input" value="0.5" step="0.25">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description / Instructions</label>
+          <textarea id="testFormDesc" class="form-textarea" rows="2" placeholder="Syllabus, topics covered and examination guidance."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%;">Save Test & Add Questions</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD QUESTION MODAL -->
+  <div class="modal-overlay" id="addQuestionModal">
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title">Add MCQ Question</div>
+        <button class="close-modal-btn" onclick="App.closeAddQuestionModal()">✕</button>
+      </div>
+
+      <form id="addQuestionForm" onsubmit="App.handleSaveQuestion(event)">
+        <input type="hidden" id="qTargetTestId" value="">
+        <div class="form-group">
+          <label class="form-label">Question Text *</label>
+          <textarea id="qText" class="form-textarea" rows="3" placeholder="Enter problem statement or question..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Option A *</label>
+          <input type="text" id="qOpt0" class="form-input" placeholder="Option A text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Option B *</label>
+          <input type="text" id="qOpt1" class="form-input" placeholder="Option B text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Option C *</label>
+          <input type="text" id="qOpt2" class="form-input" placeholder="Option C text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Option D *</label>
+          <input type="text" id="qOpt3" class="form-input" placeholder="Option D text" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Correct Option *</label>
+          <select id="qCorrectOpt" class="form-select">
+            <option value="0">Option A</option>
+            <option value="1">Option B</option>
+            <option value="2">Option C</option>
+            <option value="3">Option D</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Detailed Step-by-Step Explanation *</label>
+          <textarea id="qExplanation" class="form-textarea" rows="3" placeholder="Provide full breakdown, shortcut formula, or rule explanation..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-gold" style="width: 100%;">Save Question to Test</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FIREBASE CONFIG & SYNC MODAL -->
+  <div class="modal-overlay" id="firebaseModal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">Firebase & Cloud Storage Settings</div>
+        <button class="close-modal-btn" onclick="App.closeFirebaseModal()">✕</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        YHI Online Mock Tests connects to <strong>Firebase Authentication</strong> and <strong>Cloud Firestore</strong>. Offline LocalStorage caching is active by default so exams work reliably everywhere.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Storage Mode</label>
+        <select id="storageModeSelect" class="form-select" onchange="App.handleStorageModeChange()">
+          <option value="local">Local Storage (Active & Offline-First)</option>
+          <option value="firebase">Firebase Firestore & Auth (Live Cloud)</option>
+        </select>
+      </div>
+
+      <div id="firebaseConfigInputs" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">Firebase API Key</label>
+          <input type="text" id="fbApiKey" class="form-input" placeholder="AIzaSy...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Firebase Project ID</label>
+          <input type="text" id="fbProjectId" class="form-input" placeholder="my-exam-portal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">App ID</label>
+          <input type="text" id="fbAppId" class="form-input" placeholder="1:655746212898:web:...">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+        <button class="btn-primary" style="flex: 1;" onclick="App.saveFirebaseSettings()">Save & Connect</button>
+        <button class="btn-outline" onclick="App.closeFirebaseModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer-bar" id="mainFooter">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div style="font-size: 1.1rem; font-weight: 800; color: white;">YHI Online Mock Tests</div>
+        <div style="font-size: 0.82rem; color: #94a3b8;">
+          All-India Computer Based Test (CBT) Practice Platform.
+        </div>
+      </div>
+
+      <div class="footer-curator-badge">
+        Designed & Curated with Excellence by ARVIND YADAV ✨
+      </div>
+
+      <div style="font-size: 0.8rem; color: #64748b;">
+        © 2026 YHI Examination Systems • Ready for Public Web Deployment
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

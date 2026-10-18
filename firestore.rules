@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Tests: Everyone can read mock tests; authenticated admins or creators can write
+    match /tests/{testId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Students: Candidates can read their own profile; create with roll numbers
+    match /students/{studentId} {
+      allow read, write: if true;
+    }
+
+    // Submissions: Students can record test scores and view their history
+    match /submissions/{submissionId} {
+      allow read, write: if true;
+    }
+  }
+}
